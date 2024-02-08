@@ -1,0 +1,25 @@
+Received: 2024-01-30 19:14
+From: user1@<domain_name>
+To: user3@<domain_name>
+Subject: sample subject
+Received: <time at which received, in date: hour : minute>
+sample line1
+.
+From: user1@<domain_name>
+To: user3@<domain_name>
+Subject: sample subject
+Received: 2024-01-30 20:03
+sample line1
+.
+From: user1@<domain_name>
+To: user3@<domain_name>
+Subject: sample subject
+Received: 2024-01-30 21:50
+sample line1
+.
+From: user1@<domain_name>
+To: user3@<domain_name>
+Subject: sample subject
+Received: <time at which received, in date: hour : minute>
+sample line1
+.

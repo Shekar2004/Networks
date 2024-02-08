@@ -1,0 +1,33 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <string.h>
+
+#define BUFFER_SIZE 100
+#define PORT 5069
+
+int main(){
+
+    int sockfd;
+    int clilen;
+    struct sockaddr_in cli_addr,serv_addr;
+
+    char buf[BUFFER_SIZE];
+
+    if((sockfd=socket(AF_INET,SOCK_STREAM,0))<0){
+        perror("Socket Creation Failed!!");
+        exit(EXIT_FAILURE);
+    }
+
+    serv_addr.sin_family=AF_INET;
+    serv_addr.sin_addr.s_addr=INADDR_ANY;
+    serv_addr.sin_port=htons(PORT);
+
+    if(bind(sockfd, (struct sockaddr *)&serv_addr,sizeof(serv_addr))    
+
+    return 0;
+}

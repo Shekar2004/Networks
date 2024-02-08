@@ -37,6 +37,31 @@ void trimNewline(char *str) {
     }
 }
 
+void deletemails(int a[],char *username)
+{
+    char buf[100];
+    char file1[120];
+    char file2[120];
+    snprintf(file1,sizeof(file1),"./%s/mymailbox",username);
+    snprintf(file2,sizeof(file2),"./%s/newfile",username);
+    FILE *curr=fopen(file1,"r");
+    FILE *new=fopen(file2,"w");
+    int count=0,state=0;
+    while(fgets(buf,100,curr)!=NULL)
+    {
+        if(strncmp(buf,"From:",5)==0)
+        {
+            count++;
+            if(a[count-1]==1)state=1;
+            else state=0;
+        }
+        if(state==1);
+        else fprintf(new,"%s",buf);
+    }fclose(curr);fclose(new);
+    remove(file1);
+    rename(file2,file1);
+}
+
 int main(int argc, char* argv[]){
     //declarations
     int sockfd,newsockfd;
@@ -264,13 +289,14 @@ void mailManager(int newsockfd,char username[]){
         }
 
         if(strncmp(buf,"QUIT",4)==0){//stat for number of mails
+            deletemails(dlt,username);
             break;
         }
     }
 
-    for(int i=0;i<num_emails;i++){
-        if(dlt[i]==1){
-            printf("%d ",i+1);
-        }
-    }
+    // for(int i=0;i<num_emails;i++){
+    //     if(dlt[i]==1){
+    //         printf("%d ",i+1);
+    //     }
+    // }
 }

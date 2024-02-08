@@ -242,10 +242,17 @@ void mailManager(int newsockfd,char username[]){
                 recv(newsockfd,buf,sizeof(buf),0);
                 printf("Client: %s\n",buf);
                 if(strncmp(buf,"RETR",4)==0){//return particular mail
-
                     memset(buf,0,sizeof(buf));
                     recv(newsockfd,buf,sizeof(buf),0);
-                    printf("Client: %s\n",buf);
+                    idx=atoi(buf);
+                    printf("mail number asked: %d",idx);
+
+                    memset(accumulator,0,sizeof(accumulator));
+                    sprintf(accumulator,"From:%s\nTo:%s\nReceived:%s\nSubject:%s\n%s",emails[idx-1].from,emails[idx-1].to,emails[idx-1].received,emails[idx-1].subject,emails[idx-1].body);
+                    send(newsockfd,accumulator,sizeof(accumulator),0);
+                    // memset(buf,0,sizeof(buf));
+                    // recv(newsockfd,buf,sizeof(buf),0);
+                    // printf("Client: %s\n",buf);
                     if(strncmp(buf,"DELE",4)==0){//delete mail
 
                         

@@ -220,47 +220,51 @@ void mailManager(int newsockfd,char username[]){
         memset(buf,0,sizeof(buf));
         recv(newsockfd,buf,sizeof(buf),0);
         printf("Client: %s\n",buf);
+
         if(strncmp(buf,"STAT",4)==0){//stat for number of mails
             sprintf(buf,"%d",num_emails);
             send(newsockfd,buf,sizeof(buf),0);
+        }
 
-            memset(buf,0,sizeof(buf));
-            recv(newsockfd,buf,sizeof(buf),0);
-            printf("Client: %s\n",buf);
-            if(strncmp(buf,"LIST",4)==0){//display menu
-                for(int i=0;i<num_emails;i++){
+        if(strncmp(buf,"LIST",4)==0){//stat for number of mails
+            for(int i=0;i<num_emails;i++){
                     memset(buf,0,sizeof(buf));
                     sprintf(buf2,"%d || %s || %s || %s",i+1,emails[i].from,emails[i].received,emails[i].subject);
                     if(dlt[i]==1){
                         strcpy(buf2,"-ERR");
                     }
                     send(newsockfd,buf2,sizeof(buf2),0);
-                }
-
-                memset(buf,0,sizeof(buf));
-                recv(newsockfd,buf,sizeof(buf),0);
-                printf("Client: %s\n",buf);
-                if(strncmp(buf,"RETR",4)==0){//return particular mail
-                    memset(buf,0,sizeof(buf));
-                    recv(newsockfd,buf,sizeof(buf),0);
-                    idx=atoi(buf);
-                    printf("mail number asked: %d\n",idx);
-                    if(idx<0){
-                        break;
-                    }
-
-                    memset(accumulator,0,sizeof(accumulator));
-                    sprintf(accumulator,"From:%s\nTo:%s\nReceived:%s\nSubject:%s%s",emails[idx-1].from,emails[idx-1].to,emails[idx-1].received,emails[idx-1].subject,emails[idx-1].body);
-                    send(newsockfd,accumulator,sizeof(accumulator),0);
-                    memset(buf,0,sizeof(buf));
-                    recv(newsockfd,buf,sizeof(buf),0);
-                    printf("Client: %s\n",buf);
-                    if(strncmp(buf,"DELE",4)==0){//delete mail
-                        dlt[idx-1]=1;
-                        del_count++;
-                    }
-                }
             }
+        }
+
+        if(strncmp(buf,"RETR",4)==0){//stat for number of mails
+            memset(buf,0,sizeof(buf));
+            recv(newsockfd,buf,sizeof(buf),0);
+            idx=atoi(buf);
+            printf("mail number asked: %d\n",idx);
+            if(idx<0){
+                break;
+            }
+            memset(accumulator,0,sizeof(accumulator));
+            sprintf(accumulator,"From:%s\nTo:%s\nReceived:%s\nSubject:%s%s",emails[idx-1].from,emails[idx-1].to,emails[idx-1].received,emails[idx-1].subject,emails[idx-1].body);
+            send(newsockfd,accumulator,sizeof(accumulator),0);
+            memset(buf,0,sizeof(buf));
+            recv(newsockfd,buf,sizeof(buf),0);
+            printf("Client: %s\n",buf);
+            if(strncmp(buf,"DELE",4)==0){//delete mail
+                dlt[idx-1]=1;
+                del_count++;
+            }
+        }
+
+        if(strncmp(buf,"RSET",4)==0){//stat for number of mails
+                for(int i=0;i<num_emails;i++){
+                    dlt[i]=0;
+                }
+        }
+
+        if(strncmp(buf,"QUIT",4)==0){//stat for number of mails
+            break;
         }
     }
 

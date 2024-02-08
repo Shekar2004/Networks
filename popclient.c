@@ -70,8 +70,12 @@ int main(int argc, char *argv[]){
         recv(sockfd,buf,sizeof(buf),0);
         printf("Server: %s\n",buf);
         if(strncmp(buf,"+OK",3)==0){
-            
             handleMail(sockfd);
+            memset(buf,0,sizeof(buf));
+            // strcpy(buf,"STAT send number of mails");
+            // send(sockfd,buf,sizeof(buf),0);
+
+            // memset(buf,0,sizeof(buf));
         }
     }else{
         printf("Server: %s\n",buf);
@@ -88,14 +92,18 @@ int main(int argc, char *argv[]){
 
 void handleMail(int sockfd){
     char buf[BUFFER_SIZE];
+    char buf2[4*BUFFER_SIZE];
     int mailNo;
 
     memset(buf,0,sizeof(buf));
     strcpy(buf,"STAT send number of mails");
     send(sockfd,buf,sizeof(buf),0);
 
+    memset(buf,0,sizeof(buf));
     recv(sockfd,buf,sizeof(buf),0);
     mailNo=atoi(buf);
+
+    printf("number of mails: %d",mailNo);
 
     memset(buf,0,sizeof(buf));
     strcpy(buf,"LIST display mail menu");
@@ -103,8 +111,8 @@ void handleMail(int sockfd){
 
     printf("S.No || Sender EmailID || Received Time || Subject\n");
     for(int i=0;i<mailNo;i++){
-        memset(buf,0,sizeof(buf));
-        recv(sockfd,buf,sizeof(buf),0);
-        printf("%s\n",buf);
+        memset(buf2,0,sizeof(buf2));
+        recv(sockfd,buf2,sizeof(buf2),0);
+        printf("%s\n",buf2);
     }
 }

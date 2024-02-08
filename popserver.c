@@ -30,6 +30,13 @@ struct Email
 
 void mailManager(int newsockfd,char username[]);
 
+void trimNewline(char *str) {
+    int len = strlen(str);
+    if (len > 0 && str[len - 1] == '\n') {
+        str[len - 1] = '\0'; // Replace newline with null terminator
+    }
+}
+
 int main(int argc, char* argv[]){
     //declarations
     int sockfd,newsockfd;
@@ -129,11 +136,12 @@ int main(int argc, char* argv[]){
                 //matching password else error message
                 if(strcmp(users[k].password,password)==0){
                     strcpy(buf,"+OK password match");
+                    send(newsockfd,buf,sizeof(buf),0);
                     mailManager(newsockfd,username);
                 }else{
                     strcpy(buf,"-ERR password mismatch");
+                    send(newsockfd,buf,sizeof(buf),0);
                 }
-                send(newsockfd,buf,sizeof(buf),0);
 
             }else{
                 //user does not exist
@@ -182,12 +190,16 @@ void mailManager(int newsockfd,char username[]){
         }
 
         if(strncmp(line,"From:",5)==0){
+            trimNewline(line);
             strcpy(emails[num_emails].from,line+6);
         }else if(strncmp(line,"To:",3)==0){
+            trimNewline(line);
             strcpy(emails[num_emails].to,line+4);
         }else if(strncmp(line,"Received:",9)==0){
+            trimNewline(line);
             strcpy(emails[num_emails].received,line+10);
         }else if(strncmp(line,"Subject:",8)==0){
+            trimNewline(line);
             strcpy(emails[num_emails].subject,line+9);
         }else{
             strcat(emails[num_emails].body,line);
@@ -223,22 +235,22 @@ void mailManager(int newsockfd,char username[]){
                 for(int i=0;i<num_emails;i++){
                     memset(buf,0,sizeof(buf));
                     sprintf(buf2,"%d || %s || %s || %s",i+1,emails[i].from,emails[i].received,emails[i].subject);
-                    send(newsockfd,buf2,strlen(buf2)+1,0);
+                    send(newsockfd,buf2,sizeof(buf2),0);
                 }
 
-                // memset(buf,0,sizeof(buf));
-                // recv(newsockfd,buf,sizeof(buf),0);
-                // printf("Client: %s\n",buf);
-                // if(strncmp(buf,"RETR",4)==0){//return particular mail
+                memset(buf,0,sizeof(buf));
+                recv(newsockfd,buf,sizeof(buf),0);
+                printf("Client: %s\n",buf);
+                if(strncmp(buf,"RETR",4)==0){//return particular mail
 
-                //     memset(buf,0,sizeof(buf));
-                //     recv(newsockfd,buf,sizeof(buf),0);
-                //     printf("Client: %s\n",buf);
-                //     if(strncmp(buf,"DELE",4)==0){//delete mail
+                    memset(buf,0,sizeof(buf));
+                    recv(newsockfd,buf,sizeof(buf),0);
+                    printf("Client: %s\n",buf);
+                    if(strncmp(buf,"DELE",4)==0){//delete mail
 
                         
-                //     }
-                // }
+                    }
+                }
             }
         }
         break;

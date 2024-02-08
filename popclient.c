@@ -95,41 +95,67 @@ void handleMail(int sockfd){
     char buf2[4*BUFFER_SIZE];
     char mailInfo[4096];
     int mailNo,num_emails;
+    char del;
 
-    memset(buf,0,sizeof(buf));
-    strcpy(buf,"STAT send number of mails");
-    send(sockfd,buf,sizeof(buf),0);
+    while(1){
+        memset(buf,0,sizeof(buf));
+        strcpy(buf,"STAT send number of mails");
+        send(sockfd,buf,sizeof(buf),0);
 
-    memset(buf,0,sizeof(buf));
-    recv(sockfd,buf,sizeof(buf),0);
-    num_emails=atoi(buf);
+        memset(buf,0,sizeof(buf));
+        recv(sockfd,buf,sizeof(buf),0);
+        num_emails=atoi(buf);
 
-    // printf("number of mails: %d",);
+        // printf("number of mails: %d",);
 
-    memset(buf,0,sizeof(buf));
-    strcpy(buf,"LIST display mail menu");
-    send(sockfd,buf,sizeof(buf),0);
+        memset(buf,0,sizeof(buf));
+        strcpy(buf,"LIST display mail menu");
+        send(sockfd,buf,sizeof(buf),0);
 
-    printf("S.No || Sender EmailID || Received Time || Subject\n");
-    for(int i=0;i<num_emails;i++){
-        memset(buf2,0,sizeof(buf2));
-        recv(sockfd,buf2,sizeof(buf2),0);
-        printf("%s\n",buf2);
+        printf("S.No || Sender EmailID || Received Time || Subject\n");
+        for(int i=0;i<num_emails;i++){
+            memset(buf2,0,sizeof(buf2));
+            recv(sockfd,buf2,sizeof(buf2),0);
+            if(strncmp(buf2,"-ERR",4)!=0){
+                printf("%s\n",buf2);
+            }
+        }
+
+        do{
+            printf("Enter mail no. to see:");
+            scanf("%d",&mailNo);
+            if(mailNo>num_emails){
+                printf("Mail no. out of range, give again\n");
+            }
+        }while(mailNo>num_emails);
+
+        memset(buf,0,sizeof(buf));
+        strcpy(buf,"RETR");
+        send(sockfd,buf,sizeof(buf),0);
+
+        memset(buf,0,sizeof(buf));
+        sprintf(buf,"%d",mailNo);
+        send(sockfd,buf,sizeof(buf),0);
+
+        if(mailNo<0){
+            break;
+        }
+
+        memset(mailInfo,0,sizeof(mailInfo));
+        recv(sockfd,mailInfo,sizeof(mailInfo),0);
+        printf("Mail Asked for:\n %s",mailInfo);
+        getchar();
+        del=getchar();
+
+        if(del=='d'){
+            memset(buf,0,sizeof(buf));
+            strcpy(buf,"DELE");
+            send(sockfd,buf,sizeof(buf),0);
+        }else{
+            memset(buf,0,sizeof(buf));
+            strcpy(buf,"some random");
+            send(sockfd,buf,sizeof(buf),0);
+        }
     }
 
-    printf("Enter mail no. to see:");
-    scanf("%d",&mailNo);
-
-    memset(buf,0,sizeof(buf));
-    strcpy(buf,"RETR");
-    send(sockfd,buf,sizeof(buf),0);
-
-    memset(buf,0,sizeof(buf));
-    sprintf(buf,"%d",mailNo);
-    send(sockfd,buf,sizeof(buf),0);
-
-    memset(mailInfo,0,sizeof(mailInfo));
-    recv(sockfd,mailInfo,sizeof(mailInfo),0);
-    printf("Mail Asked for:\n %s",mailInfo);
-    
 }

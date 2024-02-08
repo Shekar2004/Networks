@@ -180,6 +180,8 @@ void mailManager(int newsockfd,char username[]){
 
     struct Email emails[MAX_EMAILS];
     int num_emails=0;
+    int del_count=0;
+    int *dlt;
     char line[BUFFER_SIZE];
 
     //reading mails
@@ -209,16 +211,10 @@ void mailManager(int newsockfd,char username[]){
 
     fclose(file);
 
-        // Print all emails
-    // for (int i = 0; i < num_emails; i++) {
-    //     printf("Email %d:\n", i + 1);
-    //     printf("From: %s", emails[i].from);
-    //     printf("To: %s", emails[i].to);
-    //     printf("Received: %s", emails[i].received);
-    //     printf("Subject: %s", emails[i].subject);
-    //     printf("Body: %s", emails[i].body);
-    //     printf("\n");
-    // }
+    dlt=(int *)malloc(num_emails*sizeof(int));
+    for(int i=0;i<num_emails;i++){
+        dlt[i]=0;
+    }
 
     while(1){
         memset(buf,0,sizeof(buf));
@@ -235,6 +231,9 @@ void mailManager(int newsockfd,char username[]){
                 for(int i=0;i<num_emails;i++){
                     memset(buf,0,sizeof(buf));
                     sprintf(buf2,"%d || %s || %s || %s",i+1,emails[i].from,emails[i].received,emails[i].subject);
+                    if(dlt[i]==1){
+                        strcpy(buf2,"-ERR");
+                    }
                     send(newsockfd,buf2,sizeof(buf2),0);
                 }
 
@@ -245,21 +244,29 @@ void mailManager(int newsockfd,char username[]){
                     memset(buf,0,sizeof(buf));
                     recv(newsockfd,buf,sizeof(buf),0);
                     idx=atoi(buf);
-                    printf("mail number asked: %d",idx);
+                    printf("mail number asked: %d\n",idx);
+                    if(idx<0){
+                        break;
+                    }
 
                     memset(accumulator,0,sizeof(accumulator));
-                    sprintf(accumulator,"From:%s\nTo:%s\nReceived:%s\nSubject:%s\n%s",emails[idx-1].from,emails[idx-1].to,emails[idx-1].received,emails[idx-1].subject,emails[idx-1].body);
+                    sprintf(accumulator,"From:%s\nTo:%s\nReceived:%s\nSubject:%s%s",emails[idx-1].from,emails[idx-1].to,emails[idx-1].received,emails[idx-1].subject,emails[idx-1].body);
                     send(newsockfd,accumulator,sizeof(accumulator),0);
-                    // memset(buf,0,sizeof(buf));
-                    // recv(newsockfd,buf,sizeof(buf),0);
-                    // printf("Client: %s\n",buf);
+                    memset(buf,0,sizeof(buf));
+                    recv(newsockfd,buf,sizeof(buf),0);
+                    printf("Client: %s\n",buf);
                     if(strncmp(buf,"DELE",4)==0){//delete mail
-
-                        
+                        dlt[idx-1]=1;
+                        del_count++;
                     }
                 }
             }
         }
-        break;
+    }
+
+    for(int i=0;i<num_emails;i++){
+        if(dlt[i]==1){
+            printf("%d ",i+1);
+        }
     }
 }

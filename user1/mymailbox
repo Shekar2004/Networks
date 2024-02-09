@@ -6,20 +6,6 @@ ewfr
 2
 .
 
-From:<shekar@mail>
-To:<user1@mail>
-Received: 2024-02-02 11:39
-Subject: abcsubje
-this is line 1
-.
-
-From:<acb@mail>
-To:<user1@mail>
-Received: 2024-02-08 18:48
-Subject: adfa
-lkajflaksdf
-.
-
 From:<acb@mail>
 To:<user1@mail>
 Received: 2024-02-08 18:48
@@ -32,5 +18,40 @@ To:<user1@mail>
 Received: 2024-02-09 02:23
 Subject: abc
 hey there how are you
+.
+
+From:<shekar@mail>
+To:<user1@mail>
+Received: 2024-02-09 11:54
+Subject: subject
+bidy of mail
+.
+
+From:<mail@mail>
+To:<user1@mail>
+Received: 2024-02-09 12:06
+Subject: subject
+this is a mail body
+.
+
+From:<user@mail>
+To:<user1@mail>
+Received: 2024-02-09 12:06
+Subject: subject
+afklanclf aksdjfd
+.
+
+From:<user@mail>
+To:<user1@mail>
+Received: 2024-02-09 12:12
+Subject: subject
+body of mail
+.
+
+From:<shekar@mail>
+To:<user1@mail>
+Received: 2024-02-09 12:17
+Subject: subjeec
+this is mail body
 .
 

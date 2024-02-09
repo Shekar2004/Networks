@@ -14,8 +14,6 @@
 #define MAX_USERS 100
 #define MAX_EMAILS 100
 
-int port;
-
 struct User{
     char username[BUFFER_SIZE];
     char password[BUFFER_SIZE];
@@ -77,11 +75,6 @@ int main(int argc, char* argv[]){
     int idx,num_users=0;
     struct User users[MAX_USERS];
 
-    port=PORT;
-    if(argc>=2){
-        port=atoi(argv[1]);
-    }
-
     //opening user file to read the number of users
     FILE *file=fopen("user.txt","r");
     if(file==NULL){
@@ -105,7 +98,7 @@ int main(int argc, char* argv[]){
     //server details
     serv_addr.sin_family=AF_INET;
     serv_addr.sin_addr.s_addr=INADDR_ANY;
-    serv_addr.sin_port=htons(port);
+    serv_addr.sin_port=htons(PORT);
 
     //socket binding
     if(bind(sockfd,(struct sockaddr *)&serv_addr,sizeof(serv_addr))<0){
@@ -116,7 +109,7 @@ int main(int argc, char* argv[]){
     //listenting
     listen(sockfd,5);
 
-    printf("Server listening at port %d...\n",port);
+    printf("Server listening at port %d...\n",PORT);
 
 
     while(1){
@@ -248,13 +241,6 @@ void mailManager(int newsockfd,char username[]){
         dlt[i]=0;
     }
 
-    memset(buf,0,sizeof(buf));
-    recv(newsockfd,buf,sizeof(buf),0);
-    // printf("Client: %s\n",buf);
-
-    sprintf(buf,"%d",num_emails);
-    send(newsockfd,buf,sizeof(buf),0);
-
     while(1){
         memset(buf,0,sizeof(buf));
         recv(newsockfd,buf,sizeof(buf),0);
@@ -280,7 +266,7 @@ void mailManager(int newsockfd,char username[]){
             memset(buf,0,sizeof(buf));
             recv(newsockfd,buf,sizeof(buf),0);
             idx=atoi(buf);
-            // printf("mail number asked: %d\n",idx);
+            printf("mail number asked: %d\n",idx);
             if(idx<0){
                 break;
             }

@@ -15,6 +15,9 @@
 #define BUFFER_SIZE 100
 #define IPADDR "127.0.0.1"
 
+int smpt_port,pop3_port;
+char address[20];
+
 int checkemailformat(char *mailid)
 {
 	int n=strlen(mailid);int count=0;
@@ -44,6 +47,15 @@ void handleMail(int sockfd);
 
 int main(int argc, char *argv[])
 {
+	strcpy(address,IPADDR);
+	smpt_port=PORT;
+	pop3_port=PPORT;
+	if(argc>=4){
+		strcpy(address,argv[1]);
+		smpt_port=atoi(argv[2]);
+		pop3_port=atoi(argv[3]);
+	}
+
 	char username[BUFFER_SIZE];
 	char password[BUFFER_SIZE];
 	printf("username: ");scanf("%[^\n]s",username);getchar();
@@ -62,8 +74,9 @@ int main(int argc, char *argv[])
 	body = (char **)malloc(80*sizeof(char *));
 
 	while(1)
-	{
-		printf("\n1. Manage Mail : Shows the stored mails of the logged in user only\n");
+	{	
+		printf("\t\t\t\t ***MAIN MENU***\n");
+		printf("1. Manage Mail : Shows the stored mails of the logged in user only\n");
 		printf("2. Send Mail : Allows the user to send a mail\n");
 		printf("3. Quit : Quits the program.\n");
 		printf("enter choice >> ");
@@ -92,8 +105,8 @@ int main(int argc, char *argv[])
 				exit(0);
 			}
 			serv_addr.sin_family = AF_INET;
-			inet_aton("127.0.0.1", &serv_addr.sin_addr);
-			serv_addr.sin_port	= htons(PORT);
+			inet_aton(address, &serv_addr.sin_addr);
+			serv_addr.sin_port	= htons(smpt_port);
 
 			if ((connect(smptfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr))) < 0) {
 				perror("Unable to connect to server\n");
@@ -107,75 +120,80 @@ int main(int argc, char *argv[])
 			recv(smptfd, buf, 100, 0);
 			// sscanf(buf,"%d %[^\n]s",&code,message);
 			// sscanf(message,"%s",message1);
-			printf("%s\n",buf);
+			printf("\nServer: %s\n",buf);
 
 			memset(buf,'\0',100);
-			sprintf(buf,"HELO %s",message1);printf("%s\n",buf);
+			sprintf(buf,"HELO %s",message1);printf("Client :%s\n",buf);
 			send(smptfd,buf,strlen(buf)+1,0);
 
 			memset(buf,'\0',100);
 			recv(smptfd, buf, 100, 0);
-			printf("%s\n",buf);
+			printf("Server: %s\n",buf);
 
 			memset(buf,'\0',100);
 			sprintf(buf,"MAIL FROM:<%s>",from);
-            printf("%s\n",buf);
+            printf("Client: %s\n",buf);
 			send(smptfd,buf,strlen(buf)+1,0);
 
 			memset(buf,'\0',100);
 			recv(smptfd, buf, 100, 0);
-            printf("%s\n",buf);
+            printf("Server: %s\n",buf);
 
 			memset(buf,'\0',100);
-			sprintf(buf,"RCPT TO:<%s>",to);printf("%s\n",buf);
+			sprintf(buf,"RCPT TO:<%s>",to);
+			printf("Client: %s\n",buf);
 			send(smptfd,buf,strlen(buf)+1,0);
 
 
 			memset(buf,'\0',100);
-			recv(smptfd, buf, 100, 0);printf("%s\n",buf);
+			recv(smptfd, buf, 100, 0);
+			printf("Server: %s\n",buf);
 			sscanf(buf,"%d",&code);
 			if(code==550){printf("Error in sending mail: <%s>\n",buf);close(smptfd);continue;}
 
 			memset(buf,'\0',100);
-			sprintf(buf,"DATA");printf("%s\n",buf);
+			sprintf(buf,"DATA");
+			printf("Client: %s\n",buf);
 			send(smptfd,buf,strlen(buf)+1,0);
 
 			memset(buf,'\0',100);
-			recv(smptfd, buf, 100, 0);printf("%s\n",buf);
+			recv(smptfd, buf, 100, 0);
+			printf("Server: %s\n",buf);
 			sscanf(buf,"%d",&code);
 
 			if(code==354)
 			{
 				memset(buf,'\0',100);
-				sprintf(buf,"From:<%s>",from);printf("%s\n",buf);
+				sprintf(buf,"From:<%s>",from);printf("Client: %s\n",buf);
 				send(smptfd,buf,100,0);
 
 				memset(buf,'\0',100);
-				sprintf(buf,"To:<%s>",to);printf("%s\n",buf);
+				sprintf(buf,"To:<%s>",to);printf("Client: %s\n",buf);
 				send(smptfd,buf,100,0);
 				//recv(smptfd, buf, 100, 0);
 				memset(buf,'\0',100);
-				printf("%d\n",sprintf(buf,"Subject: %s",subject));printf("%s\n",buf);
+				printf("%d\n",sprintf(buf,"Subject: %s",subject));printf("Client: %s\n",buf);
 				send(smptfd,buf,100,0);memset(buf,'\0',100);
 
 				for(int i=0;i<lines;i++)
 				{
 					memset(buf,'\0',100);
-					strcpy(buf,body[i]);printf("%s\n",buf);
+					strcpy(buf,body[i]);printf("Client: %s\n",buf);
 					send(smptfd,buf,100,0);
                     // printf("%d\n",i);
 				}				
 			}
             // printf("receiving....\n");
 			memset(buf,'\0',100);
-			recv(smptfd, buf, 100, 0);printf("%s\n",buf);
+			recv(smptfd, buf, 100, 0);printf("Server: %s\n",buf);
 
 			memset(buf,'\0',100);
 			sprintf(buf,"QUIT");
+			printf("Client: %s\n",buf);
 			send(smptfd,buf,5,0);
 
 			memset(buf,'\0',100);
-			recv(smptfd, buf, 100, 0);printf("%s\n",buf);
+			recv(smptfd, buf, 100, 0);printf("Server: %s\n",buf);
 			sscanf(buf,"%d",&code);
 			if(code==221)
 			{
@@ -185,7 +203,10 @@ int main(int argc, char *argv[])
 			close(smptfd);
 			continue;
 		}
-		if(n==3)exit(0);
+		if(n==3){
+			printf("Exiting the program....\n");
+			exit(0);
+		}
 	}
 
 	return 0;
@@ -201,8 +222,8 @@ void managePop(int sockfd,char username[],char password[]){
     }
 
 	serv_addr.sin_family = AF_INET;
-    inet_aton(IPADDR, &serv_addr.sin_addr);
-    serv_addr.sin_port=htons(PPORT);
+    inet_aton(address, &serv_addr.sin_addr);
+    serv_addr.sin_port=htons(pop3_port);
 
 	if(connect(sockfd,(struct sockaddr*)&serv_addr,sizeof(serv_addr))<0){
         printf("Connection failed\n");
@@ -211,7 +232,7 @@ void managePop(int sockfd,char username[],char password[]){
 
 	//OK message from server
     recv(sockfd,buf,sizeof(buf),0);
-    printf("Server: %s\n",buf);
+    printf("\nServer: %s\n",buf);
 
 	strcpy(buf,username);
     send(sockfd,buf,sizeof(buf),0);
@@ -256,15 +277,16 @@ void handleMail(int sockfd){
     num_emails=atoi(buf);
 
     while(1){
-        printf("## OPTIONS ##\n");
-        printf("1. Display number of mails in mail box\n");
-        printf("2. List all mails in mail box\n");
-        printf("3. Mail retrival\n");
-        printf("4. Reset deleted mails\n");
-        printf("5. Quit\n");
-        printf("Enter the operation number to be performed:\n");
+        printf("\n\t\t\t\t\t## OPTIONS ##\n");
+        printf("\t\t\t1. Display number of mails in mail box\n");
+        printf("\t\t\t2. List all mails in mail box\n");
+        printf("\t\t\t3. Mail retrival\n");
+        printf("\t\t\t4. Reset deleted mails\n");
+        printf("\t\t\t5. Quit\n\n");
+        printf("Enter the operation number to be performed:");
         scanf("%d",&queryNo);
 
+		printf("\n\n");
         if(queryNo==1){
             memset(buf,0,sizeof(buf));
             strcpy(buf,"STAT");
@@ -278,7 +300,7 @@ void handleMail(int sockfd){
             strcpy(buf,"LIST");
             send(sockfd,buf,sizeof(buf),0);
 
-            printf("S.No || Sender EmailID || Received Time || Subject\n");
+            printf("Listof mails:\nS.No || Sender EmailID || Received Time || Subject\n");
             for(int i=0;i<num_emails;i++){
                 memset(buf2,0,sizeof(buf2));
                 recv(sockfd,buf2,sizeof(buf2),0);
@@ -309,7 +331,7 @@ void handleMail(int sockfd){
 
             memset(mailInfo,0,sizeof(mailInfo));
             recv(sockfd,mailInfo,sizeof(mailInfo),0);
-            printf("Mail Asked for:\n %s",mailInfo);
+            printf("\nMail Asked for:\n %s",mailInfo);
             getchar();
             del=getchar();
 
@@ -319,7 +341,7 @@ void handleMail(int sockfd){
                 send(sockfd,buf,sizeof(buf),0);
             }else{
                 memset(buf,0,sizeof(buf));
-                strcpy(buf,"some random");
+                strcpy(buf,"-ERR");
                 send(sockfd,buf,sizeof(buf),0);
             }
 
@@ -327,10 +349,12 @@ void handleMail(int sockfd){
             memset(buf,0,sizeof(buf));
             strcpy(buf,"RSET");
             send(sockfd,buf,sizeof(buf),0);
-            printf("Deleted mails are reset\n");
+            printf("Deleted mails are RESET\n");
         }else if(queryNo==5){
             memset(buf,0,sizeof(buf));
             strcpy(buf,"QUIT");
+			printf("Deleting mails marked to delete...\n");
+			printf("Returning to MAIN MENU........\n\n");
             send(sockfd,buf,sizeof(buf),0);
             break;
         }

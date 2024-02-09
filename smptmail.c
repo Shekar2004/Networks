@@ -91,7 +91,7 @@ void handle_client(int client_socket){
     while(1){
         memset(buf,0,sizeof(buf));
         recv(client_socket,buf,sizeof(buf),0);
-        printf("Client says: %s\n",buf);
+        printf("Client: %s\n",buf);
 
         if(strncmp(buf,"HELO",4)==0){
             strcpy(buf,"250 OK Helo");
@@ -99,7 +99,7 @@ void handle_client(int client_socket){
 
             memset(buf,0,sizeof(buf));
             recv(client_socket,buf,sizeof(buf),0);
-            printf("Client says: %s\n",buf);
+            printf("Client: %s\n",buf);
 
             if(strncmp(buf,"MAIL FROM",9)==0){
                 strcpy(buf,"250 Sender ok");
@@ -107,7 +107,7 @@ void handle_client(int client_socket){
 
                 memset(buf,0,sizeof(buf));
                 recv(client_socket,buf,sizeof(buf),0);
-                printf("Client says: %s\n",buf);
+                printf("Client: %s\n",buf);
 
                 if(strncmp(buf,"RCPT TO",7)==0){
                     strcpy(buf,"250 Recipient ok");
@@ -115,7 +115,7 @@ void handle_client(int client_socket){
 
                     memset(buf,0,sizeof(buf));
                     recv(client_socket,buf, sizeof(buf),0);
-                    printf("Client says: %s\n",buf);
+                    printf("Client: %s\n",buf);
 
                     if(strncmp(buf,"DATA",4)==0){
                         strcpy(buf,"354 Enter mail end with \".\" on a line by itself");
@@ -124,7 +124,7 @@ void handle_client(int client_socket){
                         while(1){
                             memset(buf,0,sizeof(buf));
                             recv(client_socket,buf,sizeof(buf),0);
-                            printf("Client says: %s\n",buf);
+                            printf("Client: %s\n",buf);
 
                             if(strcmp(buf,".") == 0){
                                 strcat(accumulator,buf);strcat(accumulator,"\n");
@@ -141,7 +141,7 @@ void handle_client(int client_socket){
                                     {
                                         if(to_username[i]=='@'){to_username[i]='\0';break;}
                                     }
-                                    printf("username: %s\n",to_username);
+                                    // printf("username: %s\n",to_username);
                                     strcat(accumulator,"Received: <time at which received, in date: hour : minute>\n");
                                     // printf("reading user name\n");
                                 }
